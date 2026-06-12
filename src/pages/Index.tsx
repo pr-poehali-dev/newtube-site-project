@@ -168,236 +168,405 @@ const INITIAL_POSTS: ForumPost[] = [
   { id: 4, author: "БуферизацияНет", text: "Видео грузится 40 секунд, а реклама перед ним — мгновенно. Совпадение? Не думаю.", likes: 891, time: "3 дня назад" },
 ];
 
-// ===== МИНИ-ИГРА: НАЖМИ ПРОПУСТИТЬ =====
+// ===== ИГРА 1: ПРОПУСТИ РЕКЛАМУ =====
 const AD_TEXTS = [
-  "Устал от рекламы пылесосов? Купи наш пылесос!",
-  "Кредит под 0%! (Мелкий шрифт не читай)",
-  "Похудей за 3 дня! Врач одобрил*\n*Врач не одобрял",
-  "РАСПРОДАЖА 90%! (Было 10₽, стало 1₽)",
-  "Узнай, кто смотрел твою страницу! Нет, правда, узнай.",
-  "ОСТОРОЖНО! Ваш компьютер заражён! (Нет, не заражён)",
+  { text: "Устал от рекламы пылесосов? Купи наш пылесос! Теперь с насадкой.", sponsor: "ООО Пылесос-М" },
+  { text: "Кредит под 0%!\n\n\n\n\n*0% только в первый час. Далее 999% годовых.", sponsor: "Банк «Добрый»" },
+  { text: "Похудей за 3 дня!\nВрач одобрил.\n\n*Врач — это наш офис-менеджер Артём.", sponsor: "Диета PRO" },
+  { text: "РАСПРОДАЖА 90%!\n\nБыло: 10₽\nСтало: 1₽\nЭкономия: 9 рублей. Ты богат.", sponsor: "МегаШоп" },
+  { text: "Узнай, кто смотрел твою страницу!\n\nСпойлер: никто. Но приложение платное.", sponsor: "СталкерАпп" },
+  { text: "ВНИМАНИЕ! Ваш IQ снижается с каждой просмотренной рекламой.\n\nЭто тоже реклама.", sponsor: "Партия Новый Ютуб" },
+  { text: "Заработай 300 000₽ в месяц не выходя из дома!\n\nПросто отдай нам 50 000₽ на обучение.", sponsor: "БизнесГуру" },
 ];
 
 function SkipAdGame() {
   const [visible, setVisible] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const [skipped, setSkipped] = useState(0);
-  const [adText, setAdText] = useState(AD_TEXTS[0]);
-  const [btnPos, setBtnPos] = useState({ right: 16, bottom: 16 });
+  const [watched, setWatched] = useState(0);
+  const [adIdx, setAdIdx] = useState(0);
+  const [btnPos, setBtnPos] = useState({ x: 85, y: 80 });
+  const [shake, setShake] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const showAd = () => {
-    setAdText(AD_TEXTS[Math.floor(Math.random() * AD_TEXTS.length)]);
-    setCountdown(5);
+    setAdIdx(Math.floor(Math.random() * AD_TEXTS.length));
+    const sec = 3 + Math.floor(Math.random() * 4);
+    setCountdown(sec);
     setVisible(true);
+    setBtnPos({ x: 85, y: 80 });
   };
 
   useEffect(() => {
     if (!visible) return;
     timerRef.current = setInterval(() => {
-      setCountdown(c => {
-        if (c <= 1) { clearInterval(timerRef.current!); return 0; }
-        return c - 1;
-      });
+      setCountdown(c => { if (c <= 1) { clearInterval(timerRef.current!); return 0; } return c - 1; });
     }, 1000);
     return () => clearInterval(timerRef.current!);
   }, [visible]);
 
-  const skip = () => {
-    setSkipped(s => s + 1);
-    setVisible(false);
+  const skip = () => { setSkipped(s => s + 1); setVisible(false); };
+  const watchFull = () => { setWatched(w => w + 1); setVisible(false); };
+
+  const trySkip = () => {
+    if (countdown === 0) { skip(); return; }
+    setShake(true);
+    setBtnPos({ x: 5 + Math.random() * 80, y: 10 + Math.random() * 75 });
+    setTimeout(() => setShake(false), 300);
   };
 
-  const moveBtn = () => {
-    if (countdown > 0) {
-      setBtnPos({ right: Math.random() * 80 + 10, bottom: Math.random() * 60 + 10 });
-    }
-  };
+  const ad = AD_TEXTS[adIdx];
 
   return (
-    <div className="border border-white/10 bg-white/[0.02] p-6">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-lg">📺</span>
-        <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Тренажёр «Пропустить рекламу»</h3>
+    <div className="border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">📺</span>
+        <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Тренажёр скипера</h3>
       </div>
-      <p className="text-xs text-white/40 mb-4">Скипнул: <span className="text-[#ff0000] font-bold">{skipped}</span> раз. Ты профессионал.</p>
+      <div className="flex gap-4 text-xs">
+        <span className="text-white/40">⚡ Скипнул: <span className="text-green-400 font-bold">{skipped}</span></span>
+        <span className="text-white/40">😔 Досмотрел: <span className="text-[#ff0000] font-bold">{watched}</span></span>
+        {watched > 2 && <span className="text-yellow-500/60 text-[10px] italic">ты слабак</span>}
+      </div>
 
       {!visible ? (
-        <button onClick={showAd}
-          className="w-full py-3 bg-[#ff0000] hover:bg-[#cc0000] text-white font-oswald tracking-widest uppercase text-sm transition-all">
-          ▶ Смотреть рекламу
+        <button onClick={showAd} className="w-full py-3 bg-[#ff0000] hover:bg-[#cc0000] text-white font-oswald tracking-widest uppercase text-sm transition-all">
+          ▶ Включить рекламу
         </button>
       ) : (
-        <div className="relative bg-[#111] border border-white/20 p-5 min-h-[120px]">
-          <div className="text-xs text-white/40 mb-2 font-oswald uppercase tracking-widest">Реклама · {countdown > 0 ? `${countdown} сек` : "можно пропустить"}</div>
-          <p className="text-white/80 text-sm whitespace-pre-line">{adText}</p>
-          <button
-            onClick={countdown === 0 ? skip : undefined}
-            onMouseEnter={moveBtn}
-            style={{ position: "absolute", right: btnPos.right, bottom: btnPos.bottom }}
-            className={`px-3 py-1.5 text-xs font-oswald uppercase tracking-widest transition-all ${
-              countdown === 0
-                ? "bg-white/20 hover:bg-white/30 text-white cursor-pointer"
-                : "bg-white/5 text-white/30 cursor-not-allowed"
-            }`}
-          >
-            {countdown > 0 ? `Пропустить через ${countdown}` : "► Пропустить"}
-          </button>
+        <div className="relative bg-[#111] border border-white/20 overflow-hidden" style={{ minHeight: 180 }}>
+          <div className="flex items-center justify-between px-3 pt-2 pb-1 border-b border-white/10">
+            <span className="text-[10px] text-white/30 font-oswald uppercase tracking-widest">Реклама</span>
+            <span className="text-[10px] text-white/50 font-oswald">{ad.sponsor}</span>
+          </div>
+          <p className="text-white/80 text-sm whitespace-pre-line p-4 pb-10">{ad.text}</p>
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-3 py-2 bg-black/40">
+            <button onClick={watchFull} className="text-[10px] text-white/20 hover:text-white/40 font-oswald uppercase tracking-widest transition-colors">
+              досмотреть
+            </button>
+            <div className="flex items-center gap-2">
+              {countdown === 0 && (
+                <div className="h-1.5 w-12 bg-white/10">
+                  <div className="h-full bg-[#ff0000] w-full" />
+                </div>
+              )}
+              <button
+                onClick={trySkip}
+                style={countdown > 0 ? { position: "absolute", left: `${btnPos.x}%`, bottom: `${btnPos.y / 4}%` } : {}}
+                className={`px-3 py-1.5 text-xs font-oswald uppercase tracking-widest transition-all ${shake ? "scale-90" : ""} ${
+                  countdown === 0 ? "bg-white/25 hover:bg-white/40 text-white cursor-pointer relative" : "bg-white/5 text-white/30 cursor-pointer"
+                }`}
+              >
+                {countdown > 0 ? `▶▶ ${countdown}с` : "▶▶ Пропустить"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-// ===== МИНИ-ИГРА: ПОЙМАЙ БУФЕРИНГ =====
+// ===== ИГРА 2: УБЕЙ БУФЕРИНГ =====
 function BufferGame() {
   const [score, setScore] = useState(0);
-  const [spinning, setSpinning] = useState(false);
-  const [pos, setPos] = useState({ x: 50, y: 50 });
   const [missed, setMissed] = useState(0);
   const [active, setActive] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [timeLeft, setTimeLeft] = useState(15);
+  const [circles, setCircles] = useState<{ id: number; x: number; y: number; size: number }[]>([]);
+  const [combo, setCombo] = useState(0);
+  const [showCombo, setShowCombo] = useState(false);
+  const spawnRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const spawn = useCallback(() => {
-    setPos({ x: Math.random() * 75 + 5, y: Math.random() * 70 + 5 });
-    setSpinning(true);
-    timerRef.current = setTimeout(() => {
-      setSpinning(false);
-      setMissed(m => m + 1);
-      spawn();
-    }, 1200);
-  }, []);
-
-  const start = () => { setScore(0); setMissed(0); setActive(true); spawn(); };
-  const stop = () => { setActive(false); setSpinning(false); clearTimeout(timerRef.current!); };
-
-  const click = () => {
-    if (!spinning) return;
-    clearTimeout(timerRef.current!);
-    setScore(s => s + 1);
-    setSpinning(false);
-    timerRef.current = setTimeout(spawn, 400);
+  const start = () => {
+    setScore(0); setMissed(0); setTimeLeft(15); setCircles([]); setCombo(0); setActive(true);
+    spawnRef.current = setInterval(() => {
+      const id = Date.now();
+      const size = 28 + Math.random() * 28;
+      setCircles(c => [...c, { id, x: 5 + Math.random() * 82, y: 5 + Math.random() * 80, size }]);
+      setTimeout(() => {
+        setCircles(c => { const had = c.find(x => x.id === id); if (had) setMissed(m => m + 1); return c.filter(x => x.id !== id); });
+      }, 900 + Math.random() * 400);
+    }, 600);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => { if (t <= 1) { clearInterval(spawnRef.current!); clearInterval(timerRef.current!); setActive(false); return 0; } return t - 1; });
+    }, 1000);
   };
 
-  useEffect(() => () => clearTimeout(timerRef.current!), []);
+  const hit = (id: number) => {
+    setCircles(c => c.filter(x => x.id !== id));
+    setScore(s => s + 1);
+    setCombo(c => c + 1);
+    setShowCombo(true);
+    setTimeout(() => setShowCombo(false), 600);
+  };
+
+  useEffect(() => () => { clearInterval(spawnRef.current!); clearInterval(timerRef.current!); }, []);
 
   return (
-    <div className="border border-white/10 bg-white/[0.02] p-6">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-lg">⏳</span>
+    <div className="border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">⏳</span>
         <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Убей буферинг</h3>
       </div>
-      <div className="flex gap-4 text-xs mb-4">
-        <span className="text-white/40">Убито: <span className="text-green-400 font-bold">{score}</span></span>
-        <span className="text-white/40">Сбежало: <span className="text-[#ff0000] font-bold">{missed}</span></span>
+      <div className="flex gap-4 text-xs">
+        <span className="text-white/40">💀 Убито: <span className="text-green-400 font-bold">{score}</span></span>
+        <span className="text-white/40">😤 Сбежало: <span className="text-[#ff0000] font-bold">{missed}</span></span>
+        {active && <span className="text-white/40 ml-auto">⏱ {timeLeft}с</span>}
       </div>
 
       {!active ? (
-        <button onClick={start}
-          className="w-full py-3 border border-white/20 hover:border-white/50 text-white font-oswald tracking-widest uppercase text-sm transition-all">
-          Начать охоту
-        </button>
-      ) : (
-        <div className="relative bg-[#111] border border-white/10 h-40 overflow-hidden cursor-crosshair" onClick={click}>
-          <p className="absolute top-2 left-3 text-[10px] text-white/20">Кликни по кружку загрузки!</p>
-          {spinning && (
-            <div
-              style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full border-4 border-white/20 border-t-[#ff0000] animate-spin"
-            />
+        <div>
+          {score > 0 && (
+            <div className="bg-[#111] border border-white/10 p-3 mb-3 text-center">
+              <div className="font-oswald text-2xl text-white">{score} / {score + missed}</div>
+              <div className="text-xs text-white/30 mt-1">
+                {score >= 15 ? "👑 Легенда! YouTube боится тебя" : score >= 8 ? "💪 Неплохо, скипер!" : "😅 Буферинг победил. Пока."}
+              </div>
+            </div>
           )}
-          <button onClick={(e) => { e.stopPropagation(); stop(); }}
-            className="absolute bottom-2 right-2 text-[10px] text-white/30 hover:text-white/60 font-oswald uppercase tracking-widest">
-            стоп
+          <button onClick={start} className="w-full py-3 border border-white/20 hover:border-[#ff0000]/60 hover:text-[#ff0000] text-white font-oswald tracking-widest uppercase text-sm transition-all">
+            {score > 0 ? "Сыграть ещё" : "Начать охоту"}
           </button>
+        </div>
+      ) : (
+        <div className="relative bg-[#111] border border-white/10 overflow-hidden cursor-crosshair select-none" style={{ height: 180 }}>
+          <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle, #ff0000 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+          {showCombo && combo > 1 && (
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 font-oswald text-[#ff0000] text-sm animate-fade-in pointer-events-none">
+              x{combo} КОМБО!
+            </div>
+          )}
+          {circles.map(c => (
+            <div key={c.id} onClick={() => hit(c.id)}
+              style={{ left: `${c.x}%`, top: `${c.y}%`, width: c.size, height: c.size }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-white/20 border-t-[#ff0000] animate-spin cursor-pointer hover:scale-110 transition-transform hover:border-t-white z-10"
+            />
+          ))}
         </div>
       )}
     </div>
   );
 }
 
-// ===== ГЕНЕРАТОР НАЗВАНИЙ КАНАЛОВ =====
-const CHANNEL_PREFIXES = ["Дядя", "Мама", "Проф.", "ТОП", "Секретный", "Настоящий", "Лучший", "Официальный"];
-const CHANNEL_MIDS = ["Кулинар", "Лайфхак", "Финансист", "Психолог", "Астролог", "Геймер", "Блогер", "Историк"];
-const CHANNEL_SUBS = ["PRO", "LIVE", "2.0", "Плюс", "EXPERT", "777", "Official", "HD"];
+// ===== ИГРА 3: ГЕНЕРАТОР КАНАЛА =====
+const CH_PRE = ["Дядя", "Мама", "Проф.", "ТОП-10", "Секретный", "Настоящий", "Официальный", "Анонимный", "Таинственный", "Великий"];
+const CH_MID = ["Кулинар", "Лайфхакер", "Финансист", "Психолог", "Астролог", "Геймер", "Историк", "Диетолог", "Философ", "Механик"];
+const CH_SUF = ["PRO", "LIVE", "2.0", "Плюс", "EXPERT", "777", "HD", "ULTRA", "vs Все", "| Не фейк"];
+const CH_SUBS = ["3 подписчика", "47 подписчиков", "1 подписчик (мама)", "0 подписчиков (пока)", "12 подписчиков и 1 бот"];
+const CH_VIDEOS = [
+  "КАК Я ПОХУДЕЛ ЗА НОЧЬ (не кликбейт)",
+  "ТОП 10 ЛАЙФХАКОВ КОТОРЫЕ ИЗМЕНЯТ ЖИЗНЬ #1",
+  "МНЕ НАДО ПОГОВОРИТЬ С ВАМИ... (всё норм)",
+  "ВСКРЫЛ МАТРИЦУ. УДАЛЯТ ЧЕРЕЗ 24 ЧАСА",
+  "Первое видео на канале. Подписывайтесь.",
+];
 
 function ChannelNameGen() {
-  const [name, setName] = useState("Нажми кнопку!");
+  const [name, setName] = useState("");
+  const [subs, setSubs] = useState("");
+  const [video, setVideo] = useState("");
   const [copied, setCopied] = useState(false);
+  const [generated, setGenerated] = useState(false);
+
   const generate = () => {
-    const n = `${CHANNEL_PREFIXES[Math.floor(Math.random() * CHANNEL_PREFIXES.length)]} ${CHANNEL_MIDS[Math.floor(Math.random() * CHANNEL_MIDS.length)]} ${CHANNEL_SUBS[Math.floor(Math.random() * CHANNEL_SUBS.length)]}`;
-    setName(n); setCopied(false);
+    setName(`${CH_PRE[~~(Math.random()*CH_PRE.length)]} ${CH_MID[~~(Math.random()*CH_MID.length)]} ${CH_SUF[~~(Math.random()*CH_SUF.length)]}`);
+    setSubs(CH_SUBS[~~(Math.random()*CH_SUBS.length)]);
+    setVideo(CH_VIDEOS[~~(Math.random()*CH_VIDEOS.length)]);
+    setCopied(false); setGenerated(true);
   };
   const copy = () => { navigator.clipboard.writeText(name); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
   return (
-    <div className="border border-white/10 bg-white/[0.02] p-6">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-lg">🎬</span>
-        <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Генератор названия канала</h3>
+    <div className="border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">🎬</span>
+        <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Твой будущий канал</h3>
       </div>
-      <p className="text-xs text-white/40 mb-4">Не можешь придумать название? Мы поможем. Бесплатно.</p>
-      <div className="bg-[#111] border border-white/10 px-4 py-3 mb-3 font-oswald text-lg text-white tracking-wide">
-        {name}
-      </div>
-      <div className="flex gap-2">
-        <button onClick={generate}
-          className="flex-1 py-2.5 bg-[#ff0000] hover:bg-[#cc0000] text-white font-oswald tracking-widest uppercase text-xs transition-all">
-          Сгенерировать
+      <p className="text-xs text-white/40">Генерируем карьеру YouTube-блогера. Бесплатно.</p>
+
+      {generated && (
+        <div className="bg-[#111] border border-white/10 p-4 space-y-2">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#ff0000] flex items-center justify-center text-white font-oswald text-lg shrink-0">
+              {name[0]}
+            </div>
+            <div>
+              <div className="font-oswald text-white text-base tracking-wide">{name}</div>
+              <div className="text-[10px] text-white/30">{subs}</div>
+            </div>
+          </div>
+          <div className="border-t border-white/10 pt-2">
+            <div className="text-[10px] text-white/20 mb-1 uppercase tracking-widest">Первое видео</div>
+            <div className="text-xs text-white/60 italic">"{video}"</div>
+          </div>
+        </div>
+      )}
+      <div className="flex gap-2 mt-auto">
+        <button onClick={generate} className="flex-1 py-2.5 bg-[#ff0000] hover:bg-[#cc0000] text-white font-oswald tracking-widest uppercase text-xs transition-all">
+          {generated ? "Другой канал" : "Создать канал"}
         </button>
-        <button onClick={copy}
-          className="px-4 py-2.5 border border-white/20 hover:border-white/50 text-white text-xs font-oswald uppercase tracking-widest transition-all">
-          {copied ? "✓" : "Копировать"}
-        </button>
+        {generated && (
+          <button onClick={copy} className="px-4 py-2.5 border border-white/20 hover:border-white/50 text-white text-xs font-oswald uppercase tracking-widest transition-all">
+            {copied ? "✓" : "Копировать"}
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-// ===== СКОЛЬКО ВРЕМЕНИ ПОТЕРЯНО =====
+// ===== ИГРА 4: КАЛЬКУЛЯТОР ЖИЗНИ =====
 function TimeLostCalc() {
   const [hours, setHours] = useState(2);
-  const [years, setYears] = useState(10);
-  const total = Math.round(hours * 365 * years / 24);
-  const movies = Math.round(total * 24 / 2);
-  const books = Math.round(total * 24 / 5);
+  const [years, setYears] = useState(5);
+  const totalHours = hours * 365 * years;
+  const days = Math.round(totalHours / 24);
+  const movies = Math.round(totalHours / 2);
+  const pizza = Math.round(totalHours * 0.5);
+  const roasts = [
+    days > 300 ? "Это почти год жизни. Поздравляем." : null,
+    movies > 1000 ? "Ты мог посмотреть всё кино за историю человечества." : null,
+    hours >= 6 ? "Ты смотришь YouTube больше, чем спишь. Это медицинский факт." : null,
+    "Но ты всё равно сейчас откроешь YouTube после этого сайта. Мы знаем.",
+  ].filter(Boolean);
 
   return (
-    <div className="border border-white/10 bg-white/[0.02] p-6">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-lg">🕐</span>
-        <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Сколько жизни забрал YouTube</h3>
+    <div className="border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">🕐</span>
+        <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Сколько жизни украл YouTube</h3>
       </div>
-      <p className="text-xs text-white/40 mb-4">Введи данные и пожалей себя.</p>
-      <div className="flex gap-3 mb-4">
+      <div className="flex gap-3">
         <div className="flex-1">
           <label className="text-[10px] text-white/30 uppercase tracking-widest block mb-1">Часов в день</label>
-          <input type="number" min={1} max={24} value={hours}
-            onChange={e => setHours(+e.target.value)}
-            className="w-full bg-transparent border border-white/15 px-3 py-2 text-white text-sm outline-none focus:border-[#ff0000]/50" />
+          <input type="range" min={1} max={16} value={hours} onChange={e => setHours(+e.target.value)}
+            className="w-full accent-[#ff0000]" />
+          <div className="text-center text-[#ff0000] font-oswald text-lg">{hours}ч</div>
         </div>
         <div className="flex-1">
           <label className="text-[10px] text-white/30 uppercase tracking-widest block mb-1">Лет смотришь</label>
-          <input type="number" min={1} max={50} value={years}
-            onChange={e => setYears(+e.target.value)}
-            className="w-full bg-transparent border border-white/15 px-3 py-2 text-white text-sm outline-none focus:border-[#ff0000]/50" />
+          <input type="range" min={1} max={20} value={years} onChange={e => setYears(+e.target.value)}
+            className="w-full accent-[#ff0000]" />
+          <div className="text-center text-[#ff0000] font-oswald text-lg">{years}л</div>
         </div>
       </div>
-      <div className="space-y-2 bg-[#111] p-4 border border-white/10">
-        <div className="flex justify-between text-sm">
-          <span className="text-white/50">Потеряно дней:</span>
-          <span className="text-[#ff0000] font-oswald font-bold">{total}</span>
+      <div className="bg-[#111] border border-white/10 p-3 space-y-2">
+        {[
+          { label: "Потеряно дней", val: days, red: true },
+          { label: "Можно было посмотреть фильмов", val: movies, red: false },
+          { label: "Или съесть пицц", val: pizza, red: false },
+        ].map(({ label, val, red }) => (
+          <div key={label} className="flex justify-between text-sm">
+            <span className="text-white/40">{label}</span>
+            <span className={`font-oswald font-bold ${red ? "text-[#ff0000]" : "text-white"}`}>{val.toLocaleString()}</span>
+          </div>
+        ))}
+        <div className="border-t border-white/10 pt-2 space-y-1">
+          {roasts.map((r, i) => <p key={i} className="text-[10px] text-white/25 italic">{r}</p>)}
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-white/50">Вместо этого фильмов:</span>
-          <span className="text-white font-oswald">{movies}</span>
-        </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-white/50">Или книг:</span>
-          <span className="text-white font-oswald">{books}</span>
-        </div>
-        <p className="text-[10px] text-white/25 italic pt-1">Но ты всё равно не будешь читать книги. Мы понимаем.</p>
       </div>
+    </div>
+  );
+}
+
+// ===== ИГРА 5: УГАДАЙ ДЛИНУ РЕКЛАМЫ =====
+function GuessAdLength() {
+  const [phase, setPhase] = useState<"idle"|"counting"|"result">("idle");
+  const [start, setStart] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
+  const [guess, setGuess] = useState(0);
+  const TARGET = 5;
+  const rafRef = useRef<number>(0);
+
+  const begin = () => { setPhase("counting"); setStart(Date.now()); tick(); };
+  const tick = () => { rafRef.current = requestAnimationFrame(() => tick()); };
+  const stop = () => {
+    cancelAnimationFrame(rafRef.current);
+    const el = (Date.now() - start) / 1000;
+    setElapsed(el); setGuess(el); setPhase("result");
+  };
+  useEffect(() => () => cancelAnimationFrame(rafRef.current), []);
+
+  const diff = Math.abs(elapsed - TARGET);
+  const verdict = diff < 0.3 ? "🏆 ИДЕАЛЬНО! Ты — сам алгоритм!" : diff < 1 ? "💪 Почти! Скипер чувствует время." : diff < 2 ? "🤔 Неплохо, но реклама бы уже закончилась." : "💀 Ты смотришь YouTube слишком мало. Или слишком много.";
+
+  return (
+    <div className="border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">🎯</span>
+        <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Угадай 5 секунд рекламы</h3>
+      </div>
+      <p className="text-xs text-white/40">Нажми старт, отсчитай 5 секунд в уме и нажми стоп. Без читерства.</p>
+
+      {phase === "idle" && (
+        <button onClick={begin} className="w-full py-3 border border-white/20 hover:border-[#ff0000]/60 hover:text-[#ff0000] text-white font-oswald tracking-widest uppercase text-sm transition-all">
+          ▶ Старт
+        </button>
+      )}
+      {phase === "counting" && (
+        <button onClick={stop} className="w-full py-4 bg-[#ff0000] hover:bg-[#cc0000] text-white font-oswald tracking-widest uppercase text-lg transition-all animate-pulse">
+          ■ СТОП (сейчас 5 секунд?)
+        </button>
+      )}
+      {phase === "result" && (
+        <div className="space-y-3">
+          <div className="bg-[#111] border border-white/10 p-4 text-center">
+            <div className="text-4xl font-oswald text-white mb-1">{elapsed.toFixed(2)}с</div>
+            <div className="text-xs text-white/30">Цель была: {TARGET} секунд</div>
+            <div className="text-xs text-white/50 mt-2">{verdict}</div>
+            <div className="mt-2 h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-[#ff0000] rounded-full transition-all" style={{ width: `${Math.min(100, (elapsed / TARGET) * 100)}%` }} />
+            </div>
+          </div>
+          <button onClick={() => setPhase("idle")} className="w-full py-2.5 border border-white/20 hover:border-white/50 text-white font-oswald tracking-widest uppercase text-xs transition-all">
+            Попробовать снова
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== ИГРА 6: РАНДОМНЫЙ СОВЕТ ОТ ПАРТИИ =====
+const TIPS = [
+  "Если поставить видео на 2x скорость — реклама тоже ускоряется. Но не исчезает. Мы работаем над этим.",
+  "Лайфхак: открой видео в режиме инкогнито. Алгоритм не узнает тебя. Пока.",
+  "Совет: если реклама раздражает — вступи в нашу партию. Не поможет, но приятно.",
+  "Статистика: 73% пользователей открывают телефон прямо во время рекламы. Ты сейчас тоже хочешь.",
+  "Лайфхак дня: просто закрыть YouTube и выйти на улицу. Это не лайфхак, это терапия.",
+  "Совет от партии: если видео лагает — подуй на роутер. Не помогает, но успокаивает.",
+  "Факт: YouTube Dark Mode изобрели, чтобы ты дольше смотрел ночью. Мы разоблачили заговор.",
+  "Хочешь меньше рекламы? Смотри меньше YouTube. Хочешь меньше YouTube? Ты на правильном сайте.",
+];
+
+function RandomTip() {
+  const [tip, setTip] = useState(TIPS[0]);
+  const [idx, setIdx] = useState(0);
+  const [flipping, setFlipping] = useState(false);
+
+  const next = () => {
+    setFlipping(true);
+    setTimeout(() => {
+      const ni = (idx + 1) % TIPS.length;
+      setIdx(ni); setTip(TIPS[ni]); setFlipping(false);
+    }, 200);
+  };
+
+  return (
+    <div className="border border-white/10 bg-white/[0.02] p-6 flex flex-col gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-xl">💡</span>
+        <h3 className="font-oswald text-lg uppercase tracking-widest text-white">Совет от партии</h3>
+      </div>
+      <p className="text-xs text-white/40">Бесполезные, но честные советы. {idx + 1} / {TIPS.length}</p>
+      <div className={`bg-[#111] border border-white/10 p-4 flex-1 min-h-[80px] flex items-center transition-opacity duration-200 ${flipping ? "opacity-0" : "opacity-100"}`}>
+        <p className="text-white/70 text-sm leading-relaxed italic">"{tip}"</p>
+      </div>
+      <button onClick={next} className="w-full py-2.5 border border-white/20 hover:border-[#ff0000]/60 hover:text-[#ff0000] text-white font-oswald tracking-widest uppercase text-xs transition-all">
+        Следующий совет →
+      </button>
     </div>
   );
 }
@@ -774,8 +943,10 @@ export default function Index() {
           <div className="grid md:grid-cols-2 gap-6">
             <SkipAdGame />
             <BufferGame />
+            <GuessAdLength />
             <ChannelNameGen />
             <TimeLostCalc />
+            <RandomTip />
           </div>
         </div>
       </section>
