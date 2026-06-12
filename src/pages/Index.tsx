@@ -2,7 +2,6 @@ import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
 const HERO_IMG = "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/files/a55cc338-1b2f-4e78-939b-cef1794dc018.jpg";
-const CANDIDATE_IMG = "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/files/86138ef9-e4b7-4ea0-b99b-8b86389bdce1.jpg";
 
 const NAV_ITEMS = ["Главная", "О партии", "Кандидаты", "Новости", "Присоединиться", "Форум"];
 
@@ -29,22 +28,28 @@ const NEWS = [
 
 const CANDIDATES = [
   {
-    name: "Алексей Буферов",
+    id: 1,
+    name: "Участник №1",
     role: "Верховный Скипер Рекламы",
     slogan: "«Нажимал «пропустить» 12 000 раз. Готов к большему»",
-    img: CANDIDATE_IMG,
+    img: "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/bucket/3e7e4726-7680-49dc-a8e6-adf140161b2d.jpg",
+    program: "Обещаю: реклама только после ролика. Или вообще никогда.",
   },
   {
-    name: "Мария Плейлистова",
+    id: 2,
+    name: "Участник №2",
     role: "Министр Рекомендаций",
     slogan: "«Смотрю только то, что хочу. Пока не открою YouTube»",
-    img: CANDIDATE_IMG,
+    img: "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/bucket/aaaf158d-e200-43f3-b2dc-65d6e5cfc7da.jpg",
+    program: "Лично проверю каждый алгоритм. Глазами. Это займёт время.",
   },
   {
-    name: "Котик Васька",
-    role: "Главный Советник",
-    slogan: "«Мяу» — его единственная публичная позиция, но она исчерпывающая»",
-    img: CANDIDATE_IMG,
+    id: 3,
+    name: "Участник №3",
+    role: "Главный по Буферизации",
+    slogan: "«Я видел буферинг в 2026 году. Это должно прекратиться»",
+    img: "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/bucket/8ac7d7c5-bc11-4efd-9072-e938252e8314.jpg",
+    program: "Первый указ: скорость загрузки видео — священна.",
   },
 ];
 
@@ -80,6 +85,16 @@ export default function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [joinForm, setJoinForm] = useState({ name: "", email: "", city: "" });
   const [joinSent, setJoinSent] = useState(false);
+  const [votes, setVotes] = useState<Record<number, number>>({ 1: 14, 2: 9, 3: 21 });
+  const [votedFor, setVotedFor] = useState<number | null>(null);
+
+  const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
+
+  const vote = (id: number) => {
+    if (votedFor !== null) return;
+    setVotes(v => ({ ...v, [id]: v[id] + 1 }));
+    setVotedFor(id);
+  };
 
   const scrollTo = (section: string) => {
     setActiveSection(section);
@@ -284,7 +299,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* КАНДИДАТЫ */}
+      {/* КАНДИДАТЫ + ГОЛОСОВАНИЕ */}
       <section id="Кандидаты" className="py-24 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-4 mb-4">
@@ -292,29 +307,87 @@ export default function Index() {
             <h2 className="font-oswald text-3xl md:text-5xl uppercase tracking-widest text-white">Кандидаты</h2>
             <div className="h-px flex-1 bg-white/10" />
           </div>
-          <p className="text-center text-white/30 text-sm italic mb-16">Реальные люди. Ну, почти. Кот — точно реальный.</p>
+          <p className="text-center text-white/30 text-sm italic mb-3">Кто станет главным? Решаешь ты.</p>
+
+          {votedFor !== null && (
+            <div className="text-center mb-8">
+              <span className="inline-block px-4 py-2 bg-[#ff0000]/10 border border-[#ff0000]/30 text-[#ff0000] text-sm font-oswald tracking-widest uppercase">
+                ✓ Ваш голос засчитан за Участника №{votedFor}
+              </span>
+            </div>
+          )}
+          {votedFor === null && (
+            <p className="text-center text-[#ff0000]/70 text-xs font-oswald tracking-widest uppercase mb-10">
+              👆 Нажмите «Проголосовать» под кандидатом
+            </p>
+          )}
 
           <div className="grid md:grid-cols-3 gap-6">
-            {CANDIDATES.map((c, i) => (
-              <div
-                key={i}
-                className="group border border-white/10 hover:border-[#ff0000]/40 transition-all overflow-hidden"
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={c.img}
-                    alt={c.name}
-                    className="w-full h-56 object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
+            {CANDIDATES.map((c) => {
+              const pct = Math.round((votes[c.id] / totalVotes) * 100);
+              const isLeading = votes[c.id] === Math.max(...Object.values(votes));
+              const isVoted = votedFor === c.id;
+              return (
+                <div
+                  key={c.id}
+                  className={`group border transition-all overflow-hidden flex flex-col ${
+                    isLeading ? "border-[#ff0000]/60 shadow-[0_0_30px_rgba(255,0,0,0.1)]" : "border-white/10 hover:border-white/25"
+                  }`}
+                >
+                  {isLeading && (
+                    <div className="bg-[#ff0000] text-white text-center text-[10px] font-oswald tracking-[0.3em] uppercase py-1.5">
+                      👑 Лидирует
+                    </div>
+                  )}
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={c.img}
+                      alt={c.name}
+                      className="w-full h-64 object-cover object-top transition-all duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/20 to-transparent" />
+                  </div>
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="text-xs text-[#ff0000] font-oswald tracking-widest uppercase mb-1">{c.role}</div>
+                    <div className="font-oswald text-xl uppercase tracking-wide text-white mb-1">{c.name}</div>
+                    <div className="text-xs text-white/40 italic mb-3">{c.slogan}</div>
+                    <div className="text-xs text-white/55 mb-4 leading-relaxed">{c.program}</div>
+
+                    {/* Прогресс-бар */}
+                    <div className="mb-4">
+                      <div className="flex justify-between text-xs text-white/40 mb-1">
+                        <span>Голоса</span>
+                        <span className="font-oswald text-white/70">{pct}% · {votes[c.id]} чел.</span>
+                      </div>
+                      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#ff0000] rounded-full transition-all duration-700"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => vote(c.id)}
+                      disabled={votedFor !== null}
+                      className={`mt-auto w-full py-3 font-oswald tracking-widest uppercase text-sm transition-all ${
+                        isVoted
+                          ? "bg-[#ff0000] text-white cursor-default"
+                          : votedFor !== null
+                          ? "bg-white/5 text-white/20 cursor-not-allowed"
+                          : "bg-white/5 border border-white/20 text-white hover:bg-[#ff0000] hover:border-[#ff0000]"
+                      }`}
+                    >
+                      {isVoted ? "✓ Вы проголосовали" : "Проголосовать"}
+                    </button>
+                  </div>
                 </div>
-                <div className="p-5">
-                  <div className="text-xs text-[#ff0000] font-oswald tracking-widest uppercase mb-1">{c.role}</div>
-                  <div className="font-oswald text-xl uppercase tracking-wide text-white mb-2">{c.name}</div>
-                  <div className="text-sm text-white/40 italic">{c.slogan}</div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+
+          <div className="mt-8 text-center text-xs text-white/20 italic">
+            Всего проголосовало: {totalVotes} человек. Голосование ненастоящее, но результаты очень серьёзные.
           </div>
         </div>
       </section>
