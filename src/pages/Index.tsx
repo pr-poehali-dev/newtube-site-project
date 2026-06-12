@@ -9,52 +9,52 @@ const NAV_ITEMS = ["Главная", "О партии", "Кандидаты", "�
 const NEWS = [
   {
     date: "10 июн 2026",
-    tag: "Важно",
-    title: "Партия требует убрать рекламу перед роликами длиной менее 60 секунд",
-    text: "Государственная дума рассмотрит законопроект о минимальной длине рекламных пауз. Мы серьёзно.",
+    tag: "🔥 Срочно",
+    title: "YouTube снова показал рекламу майонеза прямо перед роликом про диеты",
+    text: "Наш главный аналитик Буферов А.В. три раза смотрел ролик подряд, чтобы убедиться. Подтверждено. Это война.",
   },
   {
     date: "5 июн 2026",
-    tag: "Программа",
-    title: "Новая инициатива: алгоритм рекомендаций должен показывать то, что ты хочешь",
-    text: "Революционная идея: интернет-платформы обязаны рекомендовать контент по интересам пользователя, а не по интересам рекламодателей.",
+    tag: "📊 Исследование",
+    title: "Учёные партии выяснили: 100% рекомендаций ведут к просмотру котиков в итоге",
+    text: "Независимое исследование на выборке из одного члена партии показало: какое бы видео вы ни открыли — через 40 минут вы смотрите котиков. Это не баг, это фича.",
   },
   {
     date: "1 июн 2026",
-    tag: "Съезд",
-    title: "Состоялся первый съезд партии. Присутствовало 47 человек и один кот",
-    text: "Кот воздержался при голосовании по вопросу монетизации. Его позиция остаётся неизменной.",
+    tag: "📅 Съезд",
+    title: "Первый съезд партии. Присутствовало 47 человек, один кот и чья-то бабушка",
+    text: "Бабушка зашла случайно — думала, что это кружок по вязанию. Осталась. Теперь отвечает за связи с общественностью.",
   },
 ];
 
 const CANDIDATES = [
   {
     name: "Алексей Буферов",
-    role: "Председатель партии",
-    slogan: "«Загрузка идей — 100%»",
+    role: "Верховный Скипер Рекламы",
+    slogan: "«Нажимал «пропустить» 12 000 раз. Готов к большему»",
     img: CANDIDATE_IMG,
   },
   {
     name: "Мария Плейлистова",
-    role: "Руководитель фракции",
-    slogan: "«Ваш голос не пойдёт в спам»",
+    role: "Министр Рекомендаций",
+    slogan: "«Смотрю только то, что хочу. Пока не открою YouTube»",
     img: CANDIDATE_IMG,
   },
   {
-    name: "Игорь Монетизов",
-    role: "Финансовый директор",
-    slogan: "«Реклама — только с вашего согласия»",
+    name: "Котик Васька",
+    role: "Главный Советник",
+    slogan: "«Мяу» — его единственная публичная позиция, но она исчерпывающая»",
     img: CANDIDATE_IMG,
   },
 ];
 
 const MANIFESTO = [
-  { icon: "Play", text: "Свободный интернет без цензуры и необоснованных блокировок" },
-  { icon: "Shield", text: "Защита авторских прав без уничтожения авторов" },
-  { icon: "Eye", text: "Прозрачные алгоритмы рекомендаций" },
-  { icon: "Volume2", text: "Реклама — только добровольная и не громче самого ролика" },
-  { icon: "Users", text: "Цифровое гражданство для каждого россиянина" },
-  { icon: "Globe", text: "Интернет — общественное благо, а не частная собственность" },
+  { icon: "SkipForward", text: "Кнопка «Пропустить рекламу» — с первой секунды. Это не просьба." },
+  { icon: "VolumeX", text: "Реклама не должна быть громче видео. Это насилие над ушами." },
+  { icon: "Clock", text: "Ролик длиной 10 минут — потому что контент, а не ради монетизации." },
+  { icon: "Repeat", text: "«Автовоспроизведение» — только по личному письменному согласию." },
+  { icon: "Cat", text: "Котики в рекомендациях — гарантированно, по требованию." },
+  { icon: "Wifi", text: "Буферизация в 2026 году — преступление против человечности." },
 ];
 
 interface ForumPost {
@@ -66,9 +66,10 @@ interface ForumPost {
 }
 
 const INITIAL_POSTS: ForumPost[] = [
-  { id: 1, author: "Народный голос", text: "Наконец-то партия, которая понимает боль каждого пользователя. Долой рекламу за 5 секунд до конца ролика!", likes: 142, time: "2 часа назад" },
-  { id: 2, author: "Аналитик_2026", text: "Программа партии заслуживает внимания. Вопрос алгоритмов — это реально важно для цифровой демократии.", likes: 89, time: "5 часов назад" },
-  { id: 3, author: "Скептик_Иванов", text: "Хорошо звучит, но как именно планируете регулировать иностранные платформы?", likes: 34, time: "вчера" },
+  { id: 1, author: "ПропустилРекламу228", text: "НАКОНЕЦ-ТО. Меня эта реклама матрасов перед роликами про рецепты доводила до белого каления. Вступаю.", likes: 312, time: "2 часа назад" },
+  { id: 2, author: "КотикВасяФанклуб", text: "А Котик Васька реально будет советником? Это единственный политик, которому я доверяю.", likes: 891, time: "5 часов назад" },
+  { id: 3, author: "ДедушкаИнтернет", text: "Внук объяснил про что партия. Поддерживаю. Реклама зубных протезов в середине кулинарного шоу — это уже перебор.", likes: 447, time: "вчера" },
+  { id: 4, author: "БуферизацияНет", text: "Пункт про буферизацию — это ЛИЧНОЕ. В 2026 году! Позор!", likes: 203, time: "3 дня назад" },
 ];
 
 export default function Index() {
@@ -176,7 +177,7 @@ export default function Index() {
         <div className="relative max-w-7xl mx-auto px-4 py-20">
           <div className="max-w-3xl">
             <div className="inline-block mb-6 px-3 py-1 border border-[#ff0000]/60 text-[#ff0000] text-xs font-oswald tracking-[0.3em] uppercase animate-fade-in">
-              Выборы 2026 · Цифровая Россия
+              Это не шутка · Ну почти
             </div>
             <h1
               className="font-oswald font-bold text-5xl md:text-8xl uppercase leading-none mb-6 animate-fade-in"
@@ -189,14 +190,14 @@ export default function Index() {
               className="text-lg md:text-xl text-white/70 font-light max-w-xl leading-relaxed mb-2 animate-fade-in"
               style={{ animationDelay: "0.25s", opacity: 0 }}
             >
-              Партия, которая борется за ваш интернет. Серьёзно.
-              Очень серьёзно. Можете не смеяться — мы и не смеёмся.
+              Мы устали нажимать «Пропустить рекламу» и решили взять власть в свои руки.
+              Буквально. Ну, почти буквально.
             </p>
             <p
               className="text-sm text-white/40 italic mb-10 animate-fade-in"
               style={{ animationDelay: "0.3s", opacity: 0 }}
             >
-              (Ну может чуть-чуть)
+              (Юридически — просто сайт. Морально — революция.)
             </p>
             <div
               className="flex flex-wrap gap-4 animate-fade-in"
@@ -220,9 +221,9 @@ export default function Index() {
 
         <div className="relative max-w-7xl mx-auto px-4 pb-16 grid grid-cols-3 gap-4 md:gap-8">
           {[
-            { num: "47", label: "Членов партии", sub: "и один кот" },
-            { num: "3", label: "Законопроекта", sub: "все про ютуб" },
-            { num: "∞", label: "Желания перемен", sub: "у каждого" },
+            { num: "47", label: "Членов партии", sub: "48-й — кот, не считается" },
+            { num: "6 000+", label: "Нажатий «Пропустить»", sub: "лично Буфеовым за месяц" },
+            { num: "0₽", label: "Взносов", sub: "мы серьёзные, не жадные" },
           ].map((stat, i) => (
             <div
               key={i}
@@ -249,20 +250,20 @@ export default function Index() {
           <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
             <div>
               <h3 className="font-oswald text-2xl md:text-3xl uppercase text-[#ff0000] mb-4 tracking-wide">
-                Мы не просто смотрим — мы действуем
+                Нас объединила реклама матрасов
               </h3>
               <p className="text-white/70 leading-relaxed mb-4 font-light">
-                Партия «Новый Ютуб» основана в 2025 году группой граждан, которые устали нажимать «пропустить рекламу»
-                и решили, что пора перестать ждать. Мы верим: цифровое пространство должно служить людям,
-                а не корпорациям.
+                Партия «Новый Ютуб» возникла в 2025 году, когда 47 человек одновременно нажали «Пропустить рекламу»
+                и случайно образовали кворум. Наш враг — не человек и не государство. Наш враг — реклама
+                матрасов перед роликом про котиков.
               </p>
               <p className="text-white/70 leading-relaxed font-light">
-                Наша программа охватывает реальные вопросы цифровой политики: право на доступ к информации,
-                прозрачность алгоритмов, защита авторов контента и пользователей. Без воды. Почти без воды.
+                Мы не обещаем снизить налоги или построить дороги. Мы обещаем, что кнопка «Пропустить» будет
+                с первой секунды. Это скромно, зато честно. Ни одна другая партия такого не обещала.
               </p>
               <div className="mt-6 inline-block px-4 py-2 bg-white/5 border-l-2 border-[#ff0000] text-sm text-white/50 italic">
-                «Мы смотрели на проблему в течение 10 лет. Хватит смотреть — пора нажать на паузу»
-                <br /><span className="text-white/30 not-italic text-xs">— Председатель партии</span>
+                «Я смотрел рекламу пылесоса 11 раз подряд, пока не понял — это знак. Нужна партия.»
+                <br /><span className="text-white/30 not-italic text-xs">— Буферов А.В., Верховный Скипер</span>
               </div>
             </div>
 
@@ -291,7 +292,7 @@ export default function Index() {
             <h2 className="font-oswald text-3xl md:text-5xl uppercase tracking-widest text-white">Кандидаты</h2>
             <div className="h-px flex-1 bg-white/10" />
           </div>
-          <p className="text-center text-white/30 text-sm italic mb-16">Реальные люди с реальными взглядами</p>
+          <p className="text-center text-white/30 text-sm italic mb-16">Реальные люди. Ну, почти. Кот — точно реальный.</p>
 
           <div className="grid md:grid-cols-3 gap-6">
             {CANDIDATES.map((c, i) => (
@@ -371,14 +372,15 @@ export default function Index() {
                 <div className="w-16 h-16 bg-[#ff0000]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Icon name="Check" size={28} className="text-[#ff0000]" />
                 </div>
-                <h3 className="font-oswald text-2xl uppercase tracking-wide text-white mb-2">Заявка принята</h3>
-                <p className="text-white/50 text-sm">Мы свяжемся с вами. И не только по вопросам ютуба.</p>
+                <h3 className="font-oswald text-2xl uppercase tracking-wide text-white mb-2">Добро пожаловать!</h3>
+                <p className="text-white/50 text-sm">Ваша заявка принята. Членский билет выслан телепатически. Котик Васька уже в курсе.</p>
               </div>
             ) : (
               <div className="border border-white/10 p-8">
-                <h3 className="font-oswald text-xl uppercase tracking-wide text-white mb-2">Стань частью движения</h3>
+                <h3 className="font-oswald text-xl uppercase tracking-wide text-white mb-2">Вступай. Это бесплатно.</h3>
                 <p className="text-white/40 text-sm mb-6 font-light">
-                  Членский взнос — 0 рублей. Просто хотеть лучшего интернета — уже достаточно.
+                  Членский взнос — 0 рублей. Обязанности — нажимать «Пропустить рекламу» с чувством достоинства.
+                  Форма одежды — свободная.
                 </p>
 
                 <div className="space-y-4">
@@ -438,7 +440,7 @@ export default function Index() {
             <h2 className="font-oswald text-3xl md:text-5xl uppercase tracking-widest text-white">Форум</h2>
             <div className="h-px flex-1 bg-white/10" />
           </div>
-          <p className="text-center text-white/30 text-sm italic mb-12">Обсуждайте идеи и программу партии</p>
+          <p className="text-center text-white/30 text-sm italic mb-12">Место, где можно выговориться про рекламу матрасов</p>
 
           <div className="max-w-2xl mx-auto">
             <div className="border border-white/10 p-5 mb-8 bg-white/[0.02]">
@@ -527,10 +529,10 @@ export default function Index() {
 
           <div className="mt-8 pt-6 border-t border-white/5 text-center">
             <p className="text-xs text-white/20">
-              © 2026 Партия «Новый Ютуб». Все права сохранены, включая право смотреть без рекламы.
+              © 2026 Партия «Новый Ютуб». Все права сохранены. Реклама запрещена. Котики приветствуются.
             </p>
             <p className="text-[10px] text-white/10 italic mt-1">
-              Данный сайт не имеет отношения к YouTube LLC. Но хотели бы.
+              Не является официальной политической партией. YouTube® — чужой товарный знак. Котик Васька — наш.
             </p>
           </div>
         </div>
