@@ -85,7 +85,7 @@ export default function Index() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [joinForm, setJoinForm] = useState({ name: "", email: "", city: "" });
   const [joinSent, setJoinSent] = useState(false);
-  const [votes, setVotes] = useState<Record<number, number>>({ 1: 14, 2: 9, 3: 21 });
+  const [votes, setVotes] = useState<Record<number, number>>({ 1: 14, 2: 38, 3: 21 });
   const [votedFor, setVotedFor] = useState<number | null>(null);
 
   const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
@@ -268,7 +268,7 @@ export default function Index() {
                 Нас объединила реклама матрасов
               </h3>
               <p className="text-white/70 leading-relaxed mb-4 font-light">
-                Партия «Новый Ютуб» возникла в 2025 году, когда 47 человек одновременно нажали «Пропустить рекламу»
+                Партия «Новый Ютуб» возникла в 2026 году, когда 47 человек одновременно нажали «Пропустить рекламу»
                 и случайно образовали кворум. Наш враг — не человек и не государство. Наш враг — реклама
                 матрасов перед роликом про котиков.
               </p>
@@ -343,9 +343,9 @@ export default function Index() {
                     <img
                       src={c.img}
                       alt={c.name}
-                      className="w-full h-64 object-cover object-top transition-all duration-500"
+                      className="w-full h-80 object-cover object-center transition-all duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0a0a0a] to-transparent" />
                   </div>
                   <div className="p-5 flex flex-col flex-1">
                     <div className="text-xs text-[#ff0000] font-oswald tracking-widest uppercase mb-1">{c.role}</div>
@@ -583,7 +583,7 @@ export default function Index() {
               </div>
               <div>
                 <div className="font-oswald font-bold text-sm tracking-[0.15em] uppercase text-white">Новый Ютуб</div>
-                <div className="text-[9px] text-white/30 tracking-[0.2em] uppercase">Партия будущего · 2025</div>
+                <div className="text-[9px] text-white/30 tracking-[0.2em] uppercase">Партия будущего · 2026</div>
               </div>
             </div>
 
@@ -602,7 +602,7 @@ export default function Index() {
 
           <div className="mt-8 pt-6 border-t border-white/5 text-center">
             <p className="text-xs text-white/20">
-              © 2026 Партия «Новый Ютуб». Все права сохранены. Реклама запрещена. Котики приветствуются.
+              © 2026 Партия «Новый Ютуб». Основана в 2026 году. Реклама запрещена. Котики приветствуются.
             </p>
             <p className="text-[10px] text-white/10 italic mt-1">
               Не является официальной политической партией. YouTube® — чужой товарный знак. Котик Васька — наш.
