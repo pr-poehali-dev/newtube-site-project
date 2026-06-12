@@ -29,7 +29,7 @@ const NEWS = [
 const CANDIDATES = [
   {
     id: 1,
-    name: "Участник №1",
+    name: "slay4",
     role: "Верховный Скипер Рекламы",
     slogan: "«Нажимал «пропустить» 12 000 раз. Готов к большему»",
     img: "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/bucket/3e7e4726-7680-49dc-a8e6-adf140161b2d.jpg",
@@ -37,7 +37,7 @@ const CANDIDATES = [
   },
   {
     id: 2,
-    name: "Участник №2",
+    name: "Илья Виги",
     role: "Министр Рекомендаций",
     slogan: "«Смотрю только то, что хочу. Пока не открою YouTube»",
     img: "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/bucket/aaaf158d-e200-43f3-b2dc-65d6e5cfc7da.jpg",
@@ -45,7 +45,7 @@ const CANDIDATES = [
   },
   {
     id: 3,
-    name: "Участник №3",
+    name: "kolplayyyyy",
     role: "Главный по Буферизации",
     slogan: "«Я видел буферинг в 2026 году. Это должно прекратиться»",
     img: "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/bucket/8ac7d7c5-bc11-4efd-9072-e938252e8314.jpg",
