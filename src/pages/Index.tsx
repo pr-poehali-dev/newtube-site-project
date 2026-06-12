@@ -1,5 +1,96 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Icon from "@/components/ui/icon";
+
+const useSound = () => {
+  type AC = typeof AudioContext;
+  const ctx = useCallback(() => new ((window.AudioContext || (window as Window & { webkitAudioContext?: AC }).webkitAudioContext) as AC)(), []);
+
+  const playSkip = useCallback(() => {
+    const ac = ctx();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = "square";
+    o.frequency.setValueAtTime(800, ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(1400, ac.currentTime + 0.05);
+    o.frequency.exponentialRampToValueAtTime(400, ac.currentTime + 0.15);
+    g.gain.setValueAtTime(0.15, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.2);
+    o.start(); o.stop(ac.currentTime + 0.2);
+  }, [ctx]);
+
+  const playVote = useCallback(() => {
+    const ac = ctx();
+    [0, 0.08, 0.16].forEach((t, i) => {
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = "sine";
+      o.frequency.value = [523, 659, 784][i];
+      g.gain.setValueAtTime(0.12, ac.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + t + 0.25);
+      o.start(ac.currentTime + t);
+      o.stop(ac.currentTime + t + 0.25);
+    });
+  }, [ctx]);
+
+  const playNav = useCallback(() => {
+    const ac = ctx();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = "sine";
+    o.frequency.setValueAtTime(440, ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(660, ac.currentTime + 0.06);
+    g.gain.setValueAtTime(0.08, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.1);
+    o.start(); o.stop(ac.currentTime + 0.1);
+  }, [ctx]);
+
+  const playLike = useCallback(() => {
+    const ac = ctx();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = "triangle";
+    o.frequency.setValueAtTime(300, ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(600, ac.currentTime + 0.08);
+    g.gain.setValueAtTime(0.1, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.12);
+    o.start(); o.stop(ac.currentTime + 0.12);
+  }, [ctx]);
+
+  const playJoin = useCallback(() => {
+    const ac = ctx();
+    const freqs = [523, 659, 784, 1047];
+    freqs.forEach((f, i) => {
+      const o = ac.createOscillator();
+      const g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = "sine";
+      o.frequency.value = f;
+      const t = ac.currentTime + i * 0.1;
+      g.gain.setValueAtTime(0.12, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      o.start(t); o.stop(t + 0.3);
+    });
+  }, [ctx]);
+
+  const playPost = useCallback(() => {
+    const ac = ctx();
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = "sawtooth";
+    o.frequency.setValueAtTime(200, ac.currentTime);
+    o.frequency.exponentialRampToValueAtTime(100, ac.currentTime + 0.1);
+    g.gain.setValueAtTime(0.08, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.15);
+    o.start(); o.stop(ac.currentTime + 0.15);
+  }, [ctx]);
+
+  return { playSkip, playVote, playNav, playLike, playJoin, playPost };
+};
 
 const HERO_IMG = "https://cdn.poehali.dev/projects/19393cb7-0092-45ec-bd7a-91a726d9fd1a/files/a55cc338-1b2f-4e78-939b-cef1794dc018.jpg";
 
@@ -87,6 +178,7 @@ export default function Index() {
   const [joinSent, setJoinSent] = useState(false);
   const [votes, setVotes] = useState<Record<number, number>>({ 1: 14, 2: 38, 3: 21 });
   const [votedFor, setVotedFor] = useState<number | null>(null);
+  const { playSkip, playVote, playNav, playLike, playJoin, playPost } = useSound();
 
   const totalVotes = Object.values(votes).reduce((a, b) => a + b, 0);
 
@@ -94,11 +186,13 @@ export default function Index() {
     if (votedFor !== null) return;
     setVotes(v => ({ ...v, [id]: v[id] + 1 }));
     setVotedFor(id);
+    playVote();
   };
 
   const scrollTo = (section: string) => {
     setActiveSection(section);
     setMobileMenuOpen(false);
+    playNav();
     const el = document.getElementById(section);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
@@ -115,15 +209,18 @@ export default function Index() {
     setPosts([post, ...posts]);
     setNewPost("");
     setNewAuthor("");
+    playPost();
   };
 
   const likePost = (id: number) => {
     setPosts(posts.map(p => p.id === id ? { ...p, likes: p.likes + 1 } : p));
+    playLike();
   };
 
   const submitJoin = () => {
     if (!joinForm.name || !joinForm.email) return;
     setJoinSent(true);
+    playJoin();
   };
 
   return (
@@ -219,13 +316,13 @@ export default function Index() {
               style={{ animationDelay: "0.4s", opacity: 0 }}
             >
               <button
-                onClick={() => scrollTo("Присоединиться")}
+                onClick={() => { playSkip(); scrollTo("Присоединиться"); }}
                 className="px-8 py-3.5 bg-[#ff0000] hover:bg-[#cc0000] text-white font-oswald tracking-widest uppercase text-sm transition-all hover:scale-105"
               >
                 Вступить в партию
               </button>
               <button
-                onClick={() => scrollTo("О партии")}
+                onClick={() => { playSkip(); scrollTo("О партии"); }}
                 className="px-8 py-3.5 border border-white/30 hover:border-white text-white font-oswald tracking-widest uppercase text-sm transition-all"
               >
                 Узнать больше
